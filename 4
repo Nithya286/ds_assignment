@@ -1,0 +1,81 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int *data;
+    int *maxData;
+    int size;
+    int capacity;
+} Stack;
+
+void initStack(Stack *stack, int capacity) {
+    stack->data = (int*)malloc(sizeof(int) * capacity);
+    stack->maxData = (int*)malloc(sizeof(int) * capacity);
+    stack->size = 0;
+    stack->capacity = capacity;
+}
+
+void push(Stack *stack, int value) {
+    if (stack->size >= stack->capacity) return;  // stack overflow check
+    stack->data[stack->size] = value;
+    if (stack->size == 0) {
+        stack->maxData[stack->size] = value;
+    } else {
+        stack->maxData[stack->size] = value > stack->maxData[stack->size - 1] ? value : stack->maxData[stack->size - 1];
+    }
+    stack->size++;
+}
+
+void pop(Stack *stack) {
+    if (stack->size == 0) return;  // stack underflow check
+    stack->size--;
+}
+
+int getMax(Stack *stack) {
+    if (stack->size == 0) return -1;  // return -1 if stack is empty
+    return stack->maxData[stack->size - 1];
+}
+
+void freeStack(Stack *stack) {
+    free(stack->data);
+    free(stack->maxData);
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    
+    Stack stack;
+    initStack(&stack, n);
+
+    char operation[20];
+    int value;
+
+    for (int i = 0; i < n; i++) {
+        scanf(" %[^\n]", operation);  // Read the whole line
+        if (operation[0] == '1') {
+            sscanf(operation, "1 %d", &value);
+            push(&stack, value);
+        } else if (operation[0] == '2') {
+            pop(&stack);
+        } else if (operation[0] == '3') {
+            printf("%d\n", getMax(&stack));
+        }
+    }
+
+    freeStack(&stack);
+    return 0;
+}
+
